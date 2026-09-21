@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "on-secondary": "#ffffff",
+          "on-error": "#ffffff",
+          "surface-dim": "#d3daef",
+          "on-secondary-fixed-variant": "#5a00c6",
+          "on-tertiary-fixed-variant": "#7d2d00",
+          "primary-fixed": "#dbe1ff",
+          "surface-bright": "#f9f9ff",
+          "on-surface-variant": "#434655",
+          "tertiary-fixed-dim": "#ffb596",
+          "tertiary-container": "#bc4800",
+          "primary": "#004ac6",
+          "secondary-fixed": "#eaddff",
+          "surface-container": "#e9edff",
+          "surface-container-low": "#f1f3ff",
+          "on-background": "#141b2b",
+          "negative-red": "#EF4444",
+          "inverse-on-surface": "#edf0ff",
+          "secondary": "#712ae2",
+          "background": "#f9f9ff",
+          "error": "#ba1a1a",
+          "secondary-fixed-dim": "#d2bbff",
+          "on-primary-fixed": "#00174b",
+          "surface-container-high": "#e1e8fd",
+          "surface": "#f9f9ff",
+          "surface-container-lowest": "#ffffff",
+          "on-tertiary": "#ffffff",
+          "positive-emerald": "#16A34A",
+          "on-secondary-container": "#fffbff",
+          "tertiary-fixed": "#ffdbcd",
+          "accent-cyan": "#38BDF8",
+          "surface-container-highest": "#dce2f7",
+          "error-container": "#ffdad6",
+          "on-error-container": "#93000a",
+          "outline": "#737686",
+          "surface-variant": "#dce2f7",
+          "inverse-surface": "#293040",
+          "on-primary-fixed-variant": "#003ea8",
+          "inverse-primary": "#b4c5ff",
+          "primary-fixed-dim": "#b4c5ff",
+          "surface-tint": "#0053db",
+          "on-tertiary-container": "#ffede6",
+          "on-primary-container": "#eeefff",
+          "on-surface": "#141b2b",
+          "on-secondary-fixed": "#25005a",
+          "primary-container": "#2563eb",
+          "on-tertiary-fixed": "#360f00",
+          "outline-variant": "#c3c6d7",
+          "tertiary": "#943700",
+          "on-primary": "#ffffff",
+          "secondary-container": "#8a4cfc"
+        },
+        "borderRadius": {
+          "DEFAULT": "0.25rem",
+          "lg": "0.5rem",
+          "xl": "0.75rem",
+          "full": "9999px"
+        },
+        "spacing": {
+          "margin": "1.5rem",
+          "space-xs": "0.25rem",
+          "space-md": "1rem",
+          "space-lg": "1.5rem",
+          "space-xl": "2.5rem",
+          "space-sm": "0.5rem",
+          "gutter": "1rem"
+        },
+        "fontFamily": {
+          "headline-lg": ["Inter"],
+          "headline-xl": ["Inter"],
+          "body-lg": ["Inter"],
+          "label-sm": ["Inter"],
+          "body-sm": ["Inter"],
+          "headline-md": ["Inter"],
+          "headline-sm": ["Inter"],
+          "body-md": ["Inter"],
+          "label-md": ["Inter"]
+        },
+        "fontSize": {
+          "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+          "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+          "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+          "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+          "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+          "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+          "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+          "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+          "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }]
+        }
+      }
+    }
+  }
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/></head><body class="bg-surface font-body-md text-on-surface flex flex-col min-h-screen"><header class="fixed top-0 inset-x-0 z-50 bg-surface/80 backdrop-blur-xl pt-safe"><div class="h-16 px-space-md flex items-center justify-between"><span class="font-headline-md text-on-surface">Transactions</span><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></header><main class="flex flex-col relative w-full px-space-md pt-16 pb-24 bg-surface flex-grow"><div class="flex flex-col w-full pb-space-xl">
+<!-- Search & Filter Bar -->
+<div class="flex items-center gap-space-sm mb-space-md">
+<div class="flex-1 flex items-center bg-surface-container-low rounded-xl px-space-md h-12">
+<span class="material-symbols-outlined text-on-surface-variant mr-space-sm">search</span>
+<input class="bg-transparent border-none outline-none w-full text-body-md text-on-surface placeholder:text-on-surface-variant" placeholder="Search transactions..." type="text"/>
+</div>
+<button class="w-12 h-12 bg-surface-container-low rounded-xl flex items-center justify-center text-on-surface hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">tune</span>
+</button>
+</div>
+<!-- Filter Chips -->
+<div class="flex items-center gap-space-sm overflow-x-auto pb-space-sm no-scrollbar mb-space-md">
+<button class="px-space-md py-2 rounded-full bg-primary text-on-primary text-label-md font-medium whitespace-nowrap shadow-sm">All</button>
+<button class="px-space-md py-2 rounded-full bg-surface-container-low text-on-surface-variant text-label-md font-medium whitespace-nowrap hover:bg-surface-container transition-colors">Expenses</button>
+<button class="px-space-md py-2 rounded-full bg-surface-container-low text-on-surface-variant text-label-md font-medium whitespace-nowrap hover:bg-surface-container transition-colors">Income</button>
+<button class="px-space-md py-2 rounded-full bg-surface-container-low text-on-surface-variant text-label-md font-medium whitespace-nowrap hover:bg-surface-container transition-colors">Transfers</button>
+</div>
+<!-- Date Selector Pill -->
+<div class="flex items-center justify-between bg-surface-container-low rounded-xl p-3 mb-space-lg">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary">calendar_today</span>
+<span class="text-body-md font-medium text-on-surface">September 2023</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">expand_more</span>
+</div>
+<!-- Transaction Groups -->
+<div class="flex flex-col gap-space-lg">
+<!-- Today -->
+<div class="flex flex-col gap-space-xs">
+<span class="text-label-sm font-semibold text-on-surface-variant uppercase tracking-wider mb-space-xs">Today</span>
+<!-- Swiggy -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-all cursor-pointer active:scale-[0.99]">
+<div class="flex items-center gap-space-md">
+<div class="w-12 h-12 rounded-xl bg-tertiary-fixed flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined">restaurant</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-body-md font-semibold text-on-surface truncate">Swiggy</span>
+<span class="text-body-sm text-on-surface-variant">Food • 7:42 PM</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-body-md font-semibold text-on-surface">-₹850</span>
+<span class="text-body-sm text-on-surface-variant">Completed</span>
+</div>
+</div>
+<!-- Uber -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-all cursor-pointer active:scale-[0.99]">
+<div class="flex items-center gap-space-md">
+<div class="w-12 h-12 rounded-xl bg-primary-fixed flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">directions_car</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-body-md font-semibold text-on-surface truncate">Uber</span>
+<span class="text-body-sm text-on-surface-variant">Transport • 5:32 PM</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-body-md font-semibold text-on-surface">-₹320</span>
+<span class="text-body-sm text-on-surface-variant">Completed</span>
+</div>
+</div>
+</div>
+<!-- Yesterday (Empty state preview moment of delight) -->
+<div class="flex flex-col gap-space-xs">
+<span class="text-label-sm font-semibold text-on-surface-variant uppercase tracking-wider mb-space-xs">Yesterday</span>
+<div class="flex items-center justify-center p-4 rounded-xl bg-surface-container-lowest text-on-surface-variant text-body-sm italic">
+        No transactions recorded yesterday. Clean slate! 🌿
+      </div>
+</div>
+<!-- This Week -->
+<div class="flex flex-col gap-space-xs">
+<span class="text-label-sm font-semibold text-on-surface-variant uppercase tracking-wider mb-space-xs">This Week</span>
+<!-- Amazon -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-all cursor-pointer active:scale-[0.99]">
+<div class="flex items-center gap-space-md">
+<div class="w-12 h-12 rounded-xl bg-secondary-fixed flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">shopping_bag</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-body-md font-semibold text-on-surface truncate">Amazon</span>
+<span class="text-body-sm text-on-surface-variant">Shopping • Sep 4</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-body-md font-semibold text-on-surface">-₹1,299</span>
+<span class="text-body-sm text-on-surface-variant">Completed</span>
+</div>
+</div>
+</div>
+<!-- This Month -->
+<div class="flex flex-col gap-space-xs">
+<span class="text-label-sm font-semibold text-on-surface-variant uppercase tracking-wider mb-space-xs">This Month</span>
+<!-- Salary -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-all cursor-pointer active:scale-[0.99]">
+<div class="flex items-center gap-space-md">
+<div class="w-12 h-12 rounded-xl bg-positive-emerald/10 flex items-center justify-center text-positive-emerald">
+<span class="material-symbols-outlined">account_balance</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-body-md font-semibold text-on-surface truncate">Salary</span>
+<span class="text-body-sm text-on-surface-variant">Income • Sep 1</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-body-md font-semibold text-positive-emerald">+₹1,50,000</span>
+<span class="text-body-sm text-positive-emerald">Credited</span>
+</div>
+</div>
+<!-- Rent -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-all cursor-pointer active:scale-[0.99]">
+<div class="flex items-center gap-space-md">
+<div class="w-12 h-12 rounded-xl bg-error-container flex items-center justify-center text-error">
+<span class="material-symbols-outlined">home</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-body-md font-semibold text-on-surface truncate">Rent</span>
+<span class="text-body-sm text-on-surface-variant">Bills • Sep 1</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-body-md font-semibold text-on-surface">-₹13,000</span>
+<span class="text-body-sm text-on-surface-variant">Completed</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Simple interactive chip selector logic
+  document.querySelectorAll('.flex.items-center.gap-space-sm.overflow-x-auto button').forEach(button => {
+    button.addEventListener('click', function() {
+      document.querySelectorAll('.flex.items-center.gap-space-sm.overflow-x-auto button').forEach(b => {
+        b.classList.remove('bg-primary', 'text-on-primary', 'shadow-sm');
+        b.classList.add('bg-surface-container-low', 'text-on-surface-variant');
+      });
+      this.classList.remove('bg-surface-container-low', 'text-on-surface-variant');
+      this.classList.add('bg-primary', 'text-on-primary', 'shadow-sm');
+    });
+  });
+</script></main><nav class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary font-bold"><div class="flex justify-around items-center h-20 px-space-xs"><a class="flex flex-col items-center justify-center gap-space-xs w-16 h-16 text-on-surface-variant transition-all" data-path="home" href="#"><span class="material-symbols-outlined">home</span><span class="text-label-sm">Home</span></a><a aria-current="page" class="flex flex-col items-center justify-center gap-space-xs w-16 h-16 transition-all text-primary font-bold" data-path="transactions" href="#"><span class="material-symbols-outlined">swap_horiz</span><span class="text-label-sm">Activity</span></a><a class="flex flex-col items-center justify-center gap-space-xs w-16 h-16 text-on-surface-variant transition-all" data-path="analytics" href="#"><span class="material-symbols-outlined">bar_chart</span><span class="text-label-sm">Analytics</span></a><a class="flex flex-col items-center justify-center gap-space-xs w-16 h-16 text-on-surface-variant transition-all" data-path="goals" href="#"><span class="material-symbols-outlined">track_changes</span><span class="text-label-sm">Goals</span></a><a class="flex flex-col items-center justify-center gap-space-xs w-16 h-16 text-on-surface-variant transition-all" data-path="profile" href="#"><span class="material-symbols-outlined">settings</span><span class="text-label-sm">Profile</span></a></div></nav></body></html>
