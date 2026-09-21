@@ -36,6 +36,7 @@ function RootNavigator() {
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="(auth)" />
       <Stack.Screen name="add-expense" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="auto-tracking" options={{ presentation: 'card', title: 'Auto Tracking' }} />
     </Stack>
   );
 }
