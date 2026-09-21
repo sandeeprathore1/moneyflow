@@ -81,6 +81,14 @@ def refresh_tokens(db: Session, refresh_token: str) -> TokenResponse:
     return _create_token_pair(db, user)
 
 
+def logout_user(db: Session, refresh_token: str) -> None:
+    token_hash = _hash_refresh_token(refresh_token)
+    stored = db.scalar(select(RefreshToken).where(RefreshToken.token_hash == token_hash))
+    if stored:
+        stored.revoked = True
+        db.commit()
+
+
 def _create_token_pair(db: Session, user: User) -> TokenResponse:
     access = create_access_token(user.id)
     refresh = create_refresh_token(user.id)

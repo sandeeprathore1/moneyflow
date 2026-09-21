@@ -16,12 +16,14 @@ export interface Budget {
   spent_amount: string;
   remaining_amount: string;
   percentage_used: number;
+  projected_month_end_spending?: string | null;
   categories: BudgetCategory[];
 }
 
-export async function getBudget(): Promise<Budget | null> {
+export async function getBudget(month?: string): Promise<Budget | null> {
   try {
-    return await apiRequest<Budget>('/api/v1/budgets');
+    const query = month ? `?month=${month}` : '';
+    return await apiRequest<Budget>(`/api/v1/budgets${query}`);
   } catch {
     return null;
   }

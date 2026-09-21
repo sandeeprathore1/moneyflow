@@ -1,3 +1,5 @@
+import * as SecureStore from 'expo-secure-store';
+
 import { apiRequest, setTokens, clearTokens } from './api';
 
 export interface UserProfile {
@@ -47,5 +49,16 @@ export async function getMe(): Promise<User> {
 }
 
 export async function logout(): Promise<void> {
+  const refreshToken = await SecureStore.getItemAsync('refresh_token');
+  if (refreshToken) {
+    try {
+      await apiRequest<void>('/api/v1/auth/logout', {
+        method: 'POST',
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      });
+    } catch {
+      // Clear local session even if server revoke fails
+    }
+  }
   await clearTokens();
 }

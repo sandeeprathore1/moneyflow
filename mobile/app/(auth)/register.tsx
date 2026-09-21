@@ -1,4 +1,4 @@
-import { Link, router } from 'expo-router';
+import { Link } from 'expo-router';
 import { useState } from 'react';
 import {
   ActivityIndicator,
@@ -29,7 +29,6 @@ export default function RegisterScreen() {
     setLoading(true);
     try {
       await register(email.trim(), password, name.trim() || undefined);
-      router.replace('/(tabs)');
     } catch {
       setError('Registration failed. Email may already be in use.');
     } finally {

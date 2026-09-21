@@ -37,5 +37,6 @@ class BudgetResponse(BaseModel):
     spent_amount: Decimal
     remaining_amount: Decimal
     percentage_used: float
+    projected_month_end_spending: Decimal | None = None
     categories: list[BudgetCategoryResponse]
     created_at: datetime

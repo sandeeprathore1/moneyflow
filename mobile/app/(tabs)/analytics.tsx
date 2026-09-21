@@ -1,14 +1,16 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Path, Stop } from 'react-native-svg';
 
 import { EmptyState } from '@/src/components/EmptyState';
 import { FilterChip } from '@/src/components/FilterChip';
 import { ScreenContainer } from '@/src/components/ScreenContainer';
 import {
+  formatMonthParam,
   getCategoryAnalytics,
   getMonthlyAnalytics,
+  shiftMonth,
   type CategoryAnalytics,
   type MonthlyAnalytics,
 } from '@/src/services/analytics';
@@ -80,14 +82,22 @@ function DonutChart({ categories }: { categories: CategoryAnalytics['categories'
 }
 
 export default function AnalyticsScreen() {
+  const [selectedMonth, setSelectedMonth] = useState(new Date());
+  const [viewMode, setViewMode] = useState<'expenses' | 'income'>('expenses');
   const [monthly, setMonthly] = useState<MonthlyAnalytics | null>(null);
   const [categories, setCategories] = useState<CategoryAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const monthParam = formatMonthParam(selectedMonth);
+  const monthLabel = selectedMonth.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [m, c] = await Promise.all([getMonthlyAnalytics(), getCategoryAnalytics()]);
+      const [m, c] = await Promise.all([
+        getMonthlyAnalytics(monthParam),
+        getCategoryAnalytics(monthParam),
+      ]);
       setMonthly(m);
       setCategories(c);
     } catch {
@@ -96,63 +106,93 @@ export default function AnalyticsScreen() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [monthParam]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
+  const primaryAmount =
+    viewMode === 'expenses'
+      ? monthly?.total_spent
+      : monthly?.total_income;
+
   return (
     <ScreenContainer>
-      <Text style={styles.title}>Analytics</Text>
-
-      <View style={styles.chips}>
-        <FilterChip label="Expenses" active />
-        <FilterChip label="Income" />
+      <View style={styles.monthRow}>
+        <Pressable onPress={() => setSelectedMonth(shiftMonth(selectedMonth, -1))}>
+          <Text style={styles.monthNav}>‹</Text>
+        </Pressable>
+        <Text style={styles.title}>{monthLabel}</Text>
+        <Pressable onPress={() => setSelectedMonth(shiftMonth(selectedMonth, 1))}>
+          <Text style={styles.monthNav}>›</Text>
+        </Pressable>
       </View>
 
       <View style={styles.chips}>
-        <FilterChip label="Week" />
-        <FilterChip label="Month" active />
-        <FilterChip label="3 Months" />
-        <FilterChip label="Year" />
+        <FilterChip
+          label="Expenses"
+          active={viewMode === 'expenses'}
+          onPress={() => setViewMode('expenses')}
+        />
+        <FilterChip
+          label="Income"
+          active={viewMode === 'income'}
+          onPress={() => setViewMode('income')}
+        />
       </View>
 
       {loading && <ActivityIndicator color={colors.primary} />}
 
       {!loading && monthly && (
         <View style={styles.card}>
-          <Text style={styles.cardLabel}>Total Spent This Month</Text>
-          <Text style={styles.cardAmount}>{formatCurrency(monthly.total_spent)}</Text>
-          {monthly.mom_change_percentage !== null && (
+          <Text style={styles.cardLabel}>
+            {viewMode === 'expenses' ? 'Total Spent' : 'Total Income'}
+          </Text>
+          <Text style={styles.cardAmount}>
+            {formatCurrency(primaryAmount ?? '0')}
+          </Text>
+          {viewMode === 'expenses' && monthly.mom_change_percentage !== null && (
             <Text style={styles.mom}>
               {monthly.mom_change_percentage > 0 ? '+' : ''}
               {monthly.mom_change_percentage.toFixed(1)}% vs last month
             </Text>
           )}
-          <LineChart data={monthly.trend} />
+          {viewMode === 'expenses' && (
+            <>
+              <Text style={styles.meta}>
+                Avg daily: {formatCurrency(monthly.average_daily_spending)} · Savings rate:{' '}
+                {monthly.savings_rate.toFixed(0)}%
+              </Text>
+              <LineChart data={monthly.trend} />
+            </>
+          )}
         </View>
       )}
 
-      {!loading && categories && categories.categories.length > 0 && (
+      {!loading && monthly && viewMode === 'expenses' && monthly.top_merchants.length > 0 && (
+        <View style={styles.card}>
+          <Text style={styles.cardLabel}>Top Merchants</Text>
+          {monthly.top_merchants.slice(0, 5).map((m) => (
+            <View key={m.merchant} style={styles.catRow}>
+              <Text style={styles.catName}>{m.merchant}</Text>
+              <Text style={styles.catAmount}>{formatCurrency(m.amount)}</Text>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {!loading && categories && categories.categories.length > 0 && viewMode === 'expenses' && (
         <View style={styles.card}>
           <Text style={styles.cardLabel}>Category Breakdown</Text>
           <View style={styles.donutRow}>
             <DonutChart categories={categories.categories} />
             <View style={styles.legend}>
-              {categories.categories.slice(0, 3).map((cat, i) => (
+              {categories.categories.slice(0, 3).map((cat) => (
                 <Text key={cat.category_name} style={styles.legendItem}>
                   {cat.category_name}: {formatCurrency(cat.amount)} ({cat.percentage.toFixed(0)}%)
                 </Text>
               ))}
             </View>
           </View>
-          {categories.categories.map((cat, i) => (
-            <View key={cat.category_name} style={styles.catRow}>
-              <Text style={styles.catName}>{cat.category_name}</Text>
-              <Text style={styles.catAmount}>
-                {formatCurrency(cat.amount)} / {cat.percentage.toFixed(0)}%
-              </Text>
-            </View>
-          ))}
         </View>
       )}
 
@@ -164,10 +204,20 @@ export default function AnalyticsScreen() {
 }
 
 const styles = StyleSheet.create({
+  monthRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.md,
+  },
+  monthNav: {
+    fontSize: 28,
+    color: colors.primary,
+    paddingHorizontal: spacing.sm,
+  },
   title: {
     ...typography.headlineMd,
     color: colors.onSurface,
-    marginBottom: spacing.md,
   },
   chips: {
     flexDirection: 'row',
@@ -193,6 +243,11 @@ const styles = StyleSheet.create({
   mom: {
     ...typography.bodySm,
     color: colors.negativeRed,
+    marginBottom: spacing.sm,
+  },
+  meta: {
+    ...typography.bodySm,
+    color: colors.onSurfaceVariant,
     marginBottom: spacing.md,
   },
   donutRow: {
@@ -201,9 +256,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     marginVertical: spacing.md,
   },
-  legend: {
-    flex: 1,
-  },
+  legend: { flex: 1 },
   legendItem: {
     ...typography.bodySm,
     color: colors.onSurfaceVariant,

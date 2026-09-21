@@ -1,3 +1,4 @@
+from calendar import monthrange
 from datetime import date
 from decimal import Decimal
 from uuid import UUID
@@ -99,6 +100,15 @@ def _to_response(db: Session, user: User, budget: Budget) -> BudgetResponse:
         )
 
     pct_total = float(spent / budget.total_amount * 100) if budget.total_amount > 0 else 0
+
+    today = date.today()
+    days_in_month = monthrange(budget.month.year, budget.month.month)[1]
+    if budget.month.year == today.year and budget.month.month == today.month:
+        days_elapsed = max(today.day, 1)
+    else:
+        days_elapsed = days_in_month
+    projected = (spent / Decimal(days_elapsed)) * Decimal(days_in_month) if days_elapsed > 0 else spent
+
     return BudgetResponse(
         id=budget.id,
         month=budget.month,
@@ -107,6 +117,7 @@ def _to_response(db: Session, user: User, budget: Budget) -> BudgetResponse:
         spent_amount=spent,
         remaining_amount=budget.total_amount - spent,
         percentage_used=pct_total,
+        projected_month_end_spending=projected,
         categories=cat_responses,
         created_at=budget.created_at,
     )

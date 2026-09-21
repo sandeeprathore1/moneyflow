@@ -61,7 +61,9 @@ UI source of truth: `docs/design-reference/DESIGN.md` and HTML mockups. Aurora F
 
 0. Research & docs  
 1. Foundation (monorepo, auth, docker, CI)  
+2. Auth + database (income_sources, recurring_transactions, user_preferences, audit_logs, onboarding)  
 3. Core expense tracker + UI  
+4. Analytics + budgets (trends, cashflow, projected spending, budget details)  
 5. Android detection  
 6. Dedup + categorization  
 7. Recurring, subscriptions, goals  

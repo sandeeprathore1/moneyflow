@@ -53,3 +53,48 @@ class CategoryAnalyticsResponse(BaseModel):
     month: date
     categories: list[CategorySpendItem]
     total: Decimal
+
+
+class MerchantSpendItem(BaseModel):
+    merchant: str
+    amount: Decimal
+    transaction_count: int
+
+
+class TransactionHighlight(BaseModel):
+    id: UUID
+    merchant: str | None
+    amount: Decimal
+    transaction_type: str
+    transaction_date: str
+
+
+class TrendsResponse(BaseModel):
+    granularity: str
+    date_from: date
+    date_to: date
+    points: list[TrendPoint]
+
+
+class CashflowPoint(BaseModel):
+    label: str
+    income: Decimal
+    expenses: Decimal
+    net: Decimal
+
+
+class CashflowResponse(BaseModel):
+    date_from: date
+    date_to: date
+    points: list[CashflowPoint]
+    total_income: Decimal
+    total_expenses: Decimal
+    net_cashflow: Decimal
+
+
+class ExtendedMonthlyAnalyticsResponse(MonthlyAnalyticsResponse):
+    average_daily_spending: Decimal
+    largest_transactions: list[TransactionHighlight]
+    top_merchants: list[MerchantSpendItem]
+    total_refunds: Decimal
+    total_transfers: Decimal

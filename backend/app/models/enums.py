@@ -23,3 +23,16 @@ class TransactionStatus(str, enum.Enum):
     COMPLETED = "COMPLETED"
     FAILED = "FAILED"
     CANCELLED = "CANCELLED"
+
+
+class IncomeFrequency(str, enum.Enum):
+    WEEKLY = "WEEKLY"
+    MONTHLY = "MONTHLY"
+    YEARLY = "YEARLY"
+    ONE_TIME = "ONE_TIME"
+
+
+class RecurringFrequency(str, enum.Enum):
+    WEEKLY = "WEEKLY"
+    MONTHLY = "MONTHLY"
+    YEARLY = "YEARLY"

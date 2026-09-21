@@ -1,4 +1,5 @@
 import { useFocusEffect } from '@react-navigation/native';
+import { Link } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -84,6 +85,16 @@ export default function GoalsScreen() {
             <Text style={styles.remaining}>
               Remaining: {formatCurrency(budget.remaining_amount)}
             </Text>
+            {budget.projected_month_end_spending && (
+              <Text style={styles.projected}>
+                Projected month-end: {formatCurrency(budget.projected_month_end_spending)}
+              </Text>
+            )}
+            <Link href="/budget-details" asChild>
+              <Pressable style={styles.detailsLink}>
+                <Text style={styles.detailsText}>View Budget Details</Text>
+              </Pressable>
+            </Link>
           </View>
 
           <Text style={styles.sectionTitle}>Category Breakdown</Text>
@@ -191,6 +202,21 @@ const styles = StyleSheet.create({
   remaining: {
     ...typography.bodySm,
     color: colors.positiveEmerald,
+    fontWeight: '600',
+  },
+  projected: {
+    ...typography.bodySm,
+    color: colors.secondary,
+    fontWeight: '600',
+    marginTop: spacing.xs,
+  },
+  detailsLink: {
+    marginTop: spacing.md,
+    alignItems: 'center',
+  },
+  detailsText: {
+    ...typography.labelMd,
+    color: colors.primary,
     fontWeight: '600',
   },
   sectionTitle: {

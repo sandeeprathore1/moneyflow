@@ -17,19 +17,25 @@ export { ErrorBoundary } from 'expo-router';
 SplashScreen.preventAutoHideAsync();
 
 function RootNavigator() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const segments = useSegments();
   const router = useRouter();
 
   useEffect(() => {
     if (isLoading) return;
     const inAuth = segments[0] === '(auth)';
+    const onOnboarding = segments.includes('onboarding');
+
     if (!isAuthenticated && !inAuth) {
       router.replace('/(auth)/login');
-    } else if (isAuthenticated && inAuth) {
-      router.replace('/(tabs)');
+    } else if (isAuthenticated && inAuth && !onOnboarding) {
+      if (user && user.profile && !user.profile.onboarding_completed) {
+        router.replace('/(auth)/onboarding');
+      } else {
+        router.replace('/(tabs)');
+      }
     }
-  }, [isAuthenticated, isLoading, segments, router]);
+  }, [isAuthenticated, isLoading, segments, router, user]);
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
@@ -39,6 +45,7 @@ function RootNavigator() {
       <Stack.Screen name="auto-tracking" options={{ presentation: 'card', title: 'Auto Tracking' }} />
       <Stack.Screen name="assistant" options={{ presentation: 'card', title: 'AI Assistant' }} />
       <Stack.Screen name="subscriptions" options={{ presentation: 'card', title: 'Subscriptions' }} />
+      <Stack.Screen name="budget-details" options={{ presentation: 'card', title: 'Budget Details' }} />
     </Stack>
   );
 }

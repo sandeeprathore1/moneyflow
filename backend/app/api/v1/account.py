@@ -8,14 +8,18 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.deps import get_current_user
+from app.models.audit_log import AuditLog
 from app.models.budget import Budget
 from app.models.category import Category
 from app.models.goal import FinancialGoal
+from app.models.income_source import IncomeSource
 from app.models.merchant_rule import MerchantCategoryRule
+from app.models.recurring_transaction import RecurringTransaction
 from app.models.refresh_token import RefreshToken
 from app.models.subscription import Subscription
 from app.models.transaction import Transaction
 from app.models.user import User
+from app.models.user_preference import UserPreference
 
 router = APIRouter(prefix="/account", tags=["account"])
 
@@ -31,8 +35,12 @@ def delete_account(
     db.execute(delete(Budget).where(Budget.user_id == user_id))
     db.execute(delete(FinancialGoal).where(FinancialGoal.user_id == user_id))
     db.execute(delete(Subscription).where(Subscription.user_id == user_id))
+    db.execute(delete(IncomeSource).where(IncomeSource.user_id == user_id))
+    db.execute(delete(RecurringTransaction).where(RecurringTransaction.user_id == user_id))
+    db.execute(delete(UserPreference).where(UserPreference.user_id == user_id))
     db.execute(delete(Category).where(Category.user_id == user_id))
     db.execute(delete(RefreshToken).where(RefreshToken.user_id == user_id))
+    db.execute(delete(AuditLog).where(AuditLog.user_id == user_id))
     db.delete(current_user)
     db.commit()
 
