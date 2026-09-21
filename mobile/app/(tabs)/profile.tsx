@@ -19,6 +19,18 @@ export default function ProfileScreen() {
         </Pressable>
       </Link>
 
+      <Link href="/subscriptions" asChild>
+        <Pressable style={styles.menuItem}>
+          <Text style={styles.menuText}>Subscriptions</Text>
+        </Pressable>
+      </Link>
+
+      <Link href="/assistant" asChild>
+        <Pressable style={styles.menuItem}>
+          <Text style={styles.menuText}>AI Assistant</Text>
+        </Pressable>
+      </Link>
+
       <Pressable style={styles.logoutBtn} onPress={logout}>
         <Text style={styles.logoutText}>Sign Out</Text>
       </Pressable>
