@@ -54,7 +54,24 @@ def get_transaction(db: Session, user: User, transaction_id: UUID) -> Transactio
 
 
 def create_transaction(db: Session, user: User, data: TransactionCreate) -> Transaction:
-    tx = Transaction(user_id=user.id, **data.model_dump())
+    payload = data.model_dump()
+    if data.merchant:
+        from app.services.dedup_service import generate_fingerprint, is_duplicate
+
+        fingerprint = generate_fingerprint(
+            data.merchant,
+            float(data.amount),
+            data.transaction_date,
+            data.transaction_type.value,
+        )
+        if is_duplicate(
+            db, user.id, fingerprint, data.merchant, float(data.amount), data.transaction_date
+        ):
+            from fastapi import HTTPException, status
+
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Duplicate transaction")
+        payload["transaction_fingerprint"] = fingerprint
+    tx = Transaction(user_id=user.id, **payload)
     db.add(tx)
     db.commit()
     db.refresh(tx)
