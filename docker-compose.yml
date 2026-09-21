@@ -1,0 +1,45 @@
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://moneyflow:moneyflow@postgres:5432/moneyflow
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET: dev-secret-change-in-production-min-32-chars
+      DEBUG: "true"
+      CORS_ORIGINS: http://localhost:8081,http://localhost:19006,exp://localhost:8081
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - ./backend:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: moneyflow
+      POSTGRES_PASSWORD: moneyflow
+      POSTGRES_DB: moneyflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U moneyflow -d moneyflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:
