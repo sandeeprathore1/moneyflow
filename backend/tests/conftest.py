@@ -13,6 +13,8 @@ os.environ["JWT_SECRET"] = "test-secret-key-minimum-32-characters-long"
 
 from app.core.database import Base, get_db
 from app.main import app
+from app.models import Budget, BudgetCategory, Category, Profile, RefreshToken, Transaction, User  # noqa: F401
+from app.services.seed_categories import seed_system_categories
 
 engine = create_engine(
     "sqlite://",
@@ -25,6 +27,11 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 @pytest.fixture(autouse=True)
 def setup_database():
     Base.metadata.create_all(bind=engine)
+    db = TestingSessionLocal()
+    try:
+        seed_system_categories(db)
+    finally:
+        db.close()
     yield
     Base.metadata.drop_all(bind=engine)
 

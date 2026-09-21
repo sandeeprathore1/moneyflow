@@ -1,19 +1,120 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { Link } from 'expo-router';
+import { useCallback, useState } from 'react';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { EmptyState } from '@/src/components/EmptyState';
+import { HeroBudgetCard } from '@/src/components/HeroBudgetCard';
+import { MetricTile } from '@/src/components/MetricTile';
 import { ScreenContainer } from '@/src/components/ScreenContainer';
+import { TransactionRow } from '@/src/components/TransactionRow';
+import { useAuth } from '@/src/hooks/useAuth';
+import { getDashboard, type DashboardData } from '@/src/services/analytics';
 import { colors, spacing, typography } from '@/src/theme';
+import { formatCurrency } from '@/src/utils/currency';
 
 export default function HomeScreen() {
+  const { user } = useAuth();
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const dashboard = await getDashboard();
+      setData(dashboard);
+    } catch {
+      setError('Could not load dashboard');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      load();
+    }, [load]),
+  );
+
+  const name = user?.profile?.display_name ?? user?.email?.split('@')[0] ?? 'there';
+  const monthLabel = data
+    ? new Date(data.month).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })
+    : new Date().toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+
   return (
     <ScreenContainer>
       <View style={styles.header}>
-        <Text style={styles.title}>Home</Text>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>S</Text>
+        <View>
+          <Text style={styles.month}>{monthLabel}</Text>
+          <Text style={styles.greeting}>Good morning, {name}</Text>
         </View>
+        <Link href="/add-expense" asChild>
+          <Pressable style={styles.addBtn}>
+            <Text style={styles.addBtnText}>+</Text>
+          </Pressable>
+        </Link>
       </View>
-      <Text style={styles.greeting}>Good morning</Text>
-      <Text style={styles.subtitle}>MoneyFlow dashboard — connect to backend to see live data.</Text>
+
+      {loading && <ActivityIndicator color={colors.primary} style={{ marginTop: 40 }} />}
+
+      {error && !loading && (
+        <EmptyState title="Couldn't sync" message={error} />
+      )}
+
+      {data && !loading && (
+        <>
+          <HeroBudgetCard
+            spent={parseFloat(data.budget_spent)}
+            budget={data.budget_total ? parseFloat(data.budget_total) : null}
+            percentageUsed={data.budget_percentage_used}
+            remaining={data.budget_remaining ? parseFloat(data.budget_remaining) : null}
+          />
+
+          <View style={styles.metrics}>
+            <MetricTile
+              label="Income"
+              value={formatCurrency(data.total_income)}
+              valueColor={colors.positiveEmerald}
+            />
+            <MetricTile label="Spent" value={formatCurrency(data.total_expenses)} />
+            <MetricTile
+              label="Saved"
+              value={formatCurrency(data.total_saved)}
+              valueColor={colors.secondary}
+            />
+          </View>
+
+          <Text style={styles.sectionTitle}>Top Categories</Text>
+          {data.top_categories.length === 0 ? (
+            <EmptyState
+              title="No expenses yet"
+              message="Add your first transaction to see spending insights."
+            />
+          ) : (
+            data.top_categories.map((cat) => (
+              <View key={cat.category_name} style={styles.categoryRow}>
+                <Text style={styles.categoryName}>{cat.category_name}</Text>
+                <Text style={styles.categoryAmount}>{formatCurrency(cat.amount)}</Text>
+              </View>
+            ))
+          )}
+
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Recent Transactions</Text>
+          </View>
+          {data.recent_transactions.map((tx) => (
+            <TransactionRow
+              key={tx.id}
+              merchant={tx.merchant ?? 'Unknown'}
+              subtitle={tx.category_name ?? undefined}
+              amount={parseFloat(tx.amount)}
+              type={tx.transaction_type}
+            />
+          ))}
+        </>
+      )}
     </ScreenContainer>
   );
 }
@@ -22,32 +123,60 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginBottom: spacing.lg,
   },
-  title: {
-    ...typography.headlineMd,
-    color: colors.onSurface,
-  },
-  avatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarText: {
-    color: colors.onPrimary,
-    fontWeight: '600',
+  month: {
+    ...typography.bodySm,
+    color: colors.onSurfaceVariant,
   },
   greeting: {
     ...typography.headlineMd,
     color: colors.onSurface,
+  },
+  addBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addBtnText: {
+    color: colors.onPrimary,
+    fontSize: 24,
+    lineHeight: 28,
+  },
+  metrics: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
+  },
+  sectionTitle: {
+    ...typography.labelMd,
+    fontWeight: '600',
+    color: colors.onSurface,
     marginBottom: spacing.sm,
   },
-  subtitle: {
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
+  },
+  categoryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.outlineVariant,
+  },
+  categoryName: {
     ...typography.bodyMd,
-    color: colors.onSurfaceVariant,
+    color: colors.onSurface,
+  },
+  categoryAmount: {
+    ...typography.labelMd,
+    color: colors.onSurface,
   },
 });
