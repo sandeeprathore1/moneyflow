@@ -1,8 +1,12 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { Link } from 'expo-router';
-import { useCallback, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import {
+  DetectedTransactionSheet,
+  type PendingDetection,
+} from '@/src/components/DetectedTransactionSheet';
 import { EmptyState } from '@/src/components/EmptyState';
 import { HeroBudgetCard } from '@/src/components/HeroBudgetCard';
 import { MetricTile } from '@/src/components/MetricTile';
@@ -10,6 +14,7 @@ import { ScreenContainer } from '@/src/components/ScreenContainer';
 import { TransactionRow } from '@/src/components/TransactionRow';
 import { useAuth } from '@/src/hooks/useAuth';
 import { getDashboard, type DashboardData } from '@/src/services/analytics';
+import { getInsights, type Insight } from '@/src/services/ai';
 import { colors, spacing, typography } from '@/src/theme';
 import { formatCurrency } from '@/src/utils/currency';
 
@@ -18,13 +23,37 @@ export default function HomeScreen() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [pending, setPending] = useState<PendingDetection | null>(null);
+  const [insights, setInsights] = useState<Insight[]>([]);
+
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+    try {
+      const { addNotificationListener } = require('moneyflow-notifications');
+      const sub = addNotificationListener((event: PendingDetection & { fingerprint?: string }) => {
+        setPending({
+          amount: event.amount,
+          merchant: event.merchant,
+          paymentMethod: event.paymentMethod,
+          sourceApplication: event.sourceApplication,
+          timestamp: event.timestamp,
+          fingerprint: event.fingerprint,
+          type: event.type,
+        });
+      });
+      return () => sub.remove();
+    } catch {
+      return undefined;
+    }
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
-      const dashboard = await getDashboard();
+      const [dashboard, insightList] = await Promise.all([getDashboard(), getInsights()]);
       setData(dashboard);
+      setInsights(insightList);
     } catch {
       setError('Could not load dashboard');
     } finally {
@@ -86,6 +115,13 @@ export default function HomeScreen() {
             />
           </View>
 
+          {insights.length > 0 && (
+            <View style={styles.insightBanner}>
+              <Text style={styles.insightLabel}>{insights[0].label}</Text>
+              <Text style={styles.insightText}>{insights[0].message}</Text>
+            </View>
+          )}
+
           <Text style={styles.sectionTitle}>Top Categories</Text>
           {data.top_categories.length === 0 ? (
             <EmptyState
@@ -115,6 +151,11 @@ export default function HomeScreen() {
           ))}
         </>
       )}
+      <DetectedTransactionSheet
+        detection={pending}
+        onClose={() => setPending(null)}
+        onSaved={load}
+      />
     </ScreenContainer>
   );
 }
@@ -151,6 +192,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: spacing.sm,
     marginBottom: spacing.lg,
+  },
+  insightBanner: {
+    backgroundColor: colors.surfaceContainer,
+    borderRadius: 12,
+    padding: spacing.md,
+    marginBottom: spacing.lg,
+    borderLeftWidth: 4,
+    borderLeftColor: colors.secondary,
+  },
+  insightLabel: {
+    ...typography.labelSm,
+    color: colors.secondary,
+    marginBottom: 4,
+  },
+  insightText: {
+    ...typography.bodySm,
+    color: colors.onSurface,
   },
   sectionTitle: {
     ...typography.labelMd,

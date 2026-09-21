@@ -21,6 +21,9 @@ class Settings(BaseSettings):
 
     CORS_ORIGINS: str = "http://localhost:8081,http://localhost:19006,exp://localhost:8081"
 
+    OPENAI_API_KEY: str | None = None
+    AI_MODEL: str = "gpt-4o-mini"
+
     @property
     def cors_origins_list(self) -> list[str]:
         return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]

@@ -13,7 +13,18 @@ os.environ["JWT_SECRET"] = "test-secret-key-minimum-32-characters-long"
 
 from app.core.database import Base, get_db
 from app.main import app
-from app.models import Budget, BudgetCategory, Category, Profile, RefreshToken, Transaction, User  # noqa: F401
+from app.models import (  # noqa: F401
+    Budget,
+    BudgetCategory,
+    Category,
+    FinancialGoal,
+    MerchantCategoryRule,
+    Profile,
+    RefreshToken,
+    Subscription,
+    Transaction,
+    User,
+)
 from app.services.seed_categories import seed_system_categories
 
 engine = create_engine(
