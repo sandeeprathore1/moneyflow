@@ -64,6 +64,17 @@ Set `EXPO_PUBLIC_API_URL` in `mobile/.env` (use `http://10.0.2.2:8000` for Andro
 - `GET /health` — Health check
 - `GET /ready` — Readiness (DB + Redis)
 
+## Supabase (production database)
+
+Host the Postgres database on [Supabase](https://supabase.com):
+
+1. Create a project in the Supabase dashboard
+2. Copy `.env.supabase.example` → `.env` and fill in `DATABASE_URL`
+3. Run `.\scripts\supabase_deploy.ps1`
+4. Start API: `docker compose -f docker-compose.supabase.yml up api`
+
+See [docs/supabase-hosting.md](docs/supabase-hosting.md) for full steps and API deployment options.
+
 ## License
 
-Private — internal development.
+Public — see [GitHub](https://github.com/sandeeprathore1/moneyflow).

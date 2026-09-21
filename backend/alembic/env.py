@@ -5,7 +5,22 @@ from sqlalchemy import engine_from_config, pool
 
 from app.core.config import get_settings
 from app.core.database import Base
-from app.models import Budget, BudgetCategory, Category, Profile, RefreshToken, Transaction, User  # noqa: F401
+from app.models import (  # noqa: F401
+    AuditLog,
+    Budget,
+    BudgetCategory,
+    Category,
+    FinancialGoal,
+    IncomeSource,
+    MerchantCategoryRule,
+    Profile,
+    RecurringTransaction,
+    RefreshToken,
+    Subscription,
+    Transaction,
+    User,
+    UserPreference,
+)
 
 config = context.config
 settings = get_settings()
@@ -30,11 +45,21 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
+def _connect_args() -> dict:
+    url = settings.DATABASE_URL
+    if "supabase.co" in url or settings.DATABASE_SSL:
+        return {"sslmode": "require"}
+    return {}
+
+
 def run_migrations_online() -> None:
+    configuration = config.get_section(config.config_ini_section, {})
+    configuration["sqlalchemy.url"] = settings.DATABASE_URL
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        configuration,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
+        connect_args=_connect_args(),
     )
 
     with connectable.connect() as connection:

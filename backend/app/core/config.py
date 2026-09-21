@@ -12,7 +12,12 @@ class Settings(BaseSettings):
     API_V1_PREFIX: str = "/api/v1"
 
     DATABASE_URL: str = "postgresql://moneyflow:moneyflow@localhost:5432/moneyflow"
+    DATABASE_SSL: bool = False
     REDIS_URL: str = "redis://localhost:6379/0"
+
+    # Supabase (optional — used by deploy scripts)
+    SUPABASE_PROJECT_REF: str | None = None
+    SUPABASE_DB_PASSWORD: str | None = None
 
     JWT_SECRET: str = "dev-secret-change-in-production-min-32-chars"
     JWT_ALGORITHM: str = "HS256"
