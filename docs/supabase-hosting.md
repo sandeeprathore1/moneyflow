@@ -23,11 +23,19 @@ Edit `.env`:
 | `SUPABASE_DB_PASSWORD` | Password you chose at project creation |
 | `DATABASE_URL` | Project Settings → Database → URI (direct, port **5432**) |
 
-Example URI:
+Example URI (direct):
 
 ```
 postgresql://postgres:[PASSWORD]@db.[PROJECT_REF].supabase.co:5432/postgres?sslmode=require
 ```
+
+**Docker Desktop on Windows:** the direct `db.*` host may be **IPv6-only** and fail from containers. Use the **Session pooler** (IPv4) instead:
+
+```
+postgresql://postgres.[PROJECT_REF]:[PASSWORD]@aws-0-ap-south-1.pooler.supabase.com:5432/postgres?sslmode=require
+```
+
+Pick the pooler region shown in Supabase → Database → Connection string.
 
 Set `DATABASE_SSL=true`.
 
