@@ -4,7 +4,7 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 
 from app.core.config import get_settings
-from app.core.database import Base
+from app.core.database import Base, sqlalchemy_url
 from app.models import (  # noqa: F401
     AuditLog,
     Budget,
@@ -24,7 +24,7 @@ from app.models import (  # noqa: F401
 
 config = context.config
 settings = get_settings()
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+config.set_main_option("sqlalchemy.url", sqlalchemy_url(settings.DATABASE_URL))
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
@@ -54,7 +54,7 @@ def _connect_args() -> dict:
 
 def run_migrations_online() -> None:
     configuration = config.get_section(config.config_ini_section, {})
-    configuration["sqlalchemy.url"] = settings.DATABASE_URL
+    configuration["sqlalchemy.url"] = sqlalchemy_url(settings.DATABASE_URL)
     connectable = engine_from_config(
         configuration,
         prefix="sqlalchemy.",
